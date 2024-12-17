@@ -32,39 +32,39 @@ import (
 	"testing"
 	"time"
 
+	base "github.com/Cray-HPE/hms-base"
 	"github.com/Cray-HPE/hms-certs/pkg/hms_certs"
 	"github.com/Cray-HPE/hms-power-control/internal/credstore"
 	"github.com/Cray-HPE/hms-power-control/internal/hsm"
 	"github.com/Cray-HPE/hms-power-control/internal/logger"
 	"github.com/Cray-HPE/hms-power-control/internal/model"
 	"github.com/Cray-HPE/hms-power-control/internal/storage"
-	base "github.com/Cray-HPE/hms-base"
 	trsapi "github.com/Cray-HPE/hms-trs-app-api/v3/pkg/trs_http_api"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 )
 
 type Transitions_TS struct {
-    suite.Suite
-    hsmURL string
+	suite.Suite
+	hsmURL string
 }
 
 // Sets up everything needed for running power capping domain functions such as
 // httptest servers, HSM/storage/trs packages, etc.
 func (ts *Transitions_TS) SetupSuite() {
 	var (
-		Running bool = true
-		svcClient *hms_certs.HTTPClientPair
+		Running           bool = true
+		svcClient         *hms_certs.HTTPClientPair
 		TLOC_rf, TLOC_svc trsapi.TrsAPI
-		rfClientLock *sync.RWMutex = &sync.RWMutex{}
-		serviceName string = "PCS-domain-transitions-test"
-		DSP storage.StorageProvider
-		DLOCK storage.DistributedLockProvider
-		HSM hsm.HSMProvider
+		rfClientLock      *sync.RWMutex = &sync.RWMutex{}
+		serviceName       string        = "PCS-domain-transitions-test"
+		DSP               storage.StorageProvider
+		DLOCK             storage.DistributedLockProvider
+		HSM               hsm.HSMProvider
 		// StateManagerServer string
 		credStoreGlob credstore.CREDSTORE_GLOBALS
-		CS credstore.CredStoreProvider
-		BaseTRSTask trsapi.HttpTask
+		CS            credstore.CredStoreProvider
+		BaseTRSTask   trsapi.HttpTask
 		domainGlobals DOMAIN_GLOBALS
 	)
 
@@ -119,19 +119,19 @@ func (ts *Transitions_TS) SetupSuite() {
 	HSM = &hsm.HSMv2{}
 
 	hsmGlob := hsm.HSM_GLOBALS{
-		SvcName: serviceName,
-		Logger: logger.Log,
-		Running: &Running,
-		LockEnabled: true,
-		SMUrl: os.Getenv("SMS_SERVER"),
+		SvcName:       serviceName,
+		Logger:        logger.Log,
+		Running:       &Running,
+		LockEnabled:   true,
+		SMUrl:         os.Getenv("SMS_SERVER"),
 		SVCHttpClient: svcClient,
 	}
 	HSM.Init(&hsmGlob)
 	ts.hsmURL = hsmGlob.SMUrl
 
 	domainGlobals.NewGlobals(&BaseTRSTask, &TLOC_rf, &TLOC_svc, nil, svcClient,
-	                         rfClientLock, &Running, &DSP, &HSM, enableVault, &CS,
-	                         &DLOCK, 20000, 1440, "transitions_test-pod")
+		rfClientLock, &Running, &DSP, &HSM, enableVault, &CS,
+		&DLOCK, 20000, 1440, "transitions_test-pod")
 	Init(&domainGlobals)
 
 	// Calling PowerStatusMonitorInit() is required to initialize the
@@ -153,7 +153,7 @@ func (ts *Transitions_TS) SetupSuite() {
 }
 
 func TestTransitionsTestSuite(t *testing.T) {
-    suite.Run(t, new(Transitions_TS))
+	suite.Run(t, new(Transitions_TS))
 }
 
 //////////
@@ -186,11 +186,11 @@ func (ts *Transitions_TS) TestDoTransition() {
 	resultsPb = GetTransition(testTransition.TransitionID)
 	results = resultsPb.Obj.(model.TransitionResp)
 	ts.Assert().Equal(model.TransitionStatusCompleted, results.TransitionStatus,
-	                  "Test 1 failed with transition status, %s. Expected %s",
-	                  results.TransitionStatus, model.TransitionStatusCompleted)
+		"Test 1 failed with transition status, %s. Expected %s",
+		results.TransitionStatus, model.TransitionStatusCompleted)
 	ts.Assert().Equal(2, results.TaskCounts.Failed,
-	                  "Test 1 failed with unexpected task failure count, %d. Expected %d",
-	                  results.TaskCounts.Failed, 2)
+		"Test 1 failed with unexpected task failure count, %d. Expected %d",
+		results.TaskCounts.Failed, 2)
 
 	/////////
 	// Test 2 - doTransition() No power state data.
@@ -209,11 +209,11 @@ func (ts *Transitions_TS) TestDoTransition() {
 	resultsPb = GetTransition(testTransition.TransitionID)
 	results = resultsPb.Obj.(model.TransitionResp)
 	ts.Assert().Equal(model.TransitionStatusCompleted, results.TransitionStatus,
-	                  "Test 2 failed with transition status, %s. Expected %s",
-	                  results.TransitionStatus, model.TransitionStatusCompleted)
+		"Test 2 failed with transition status, %s. Expected %s",
+		results.TransitionStatus, model.TransitionStatusCompleted)
 	ts.Assert().Equal(2, results.TaskCounts.Failed,
-	                  "Test 2 failed with unexpected task failure count, %d. Expected %d",
-	                  results.TaskCounts.Failed, 2)
+		"Test 2 failed with unexpected task failure count, %d. Expected %d",
+		results.TaskCounts.Failed, 2)
 
 	/////////
 	// Gather power state data for the next tests
@@ -239,11 +239,11 @@ func (ts *Transitions_TS) TestDoTransition() {
 	resultsPb = GetTransition(testTransition.TransitionID)
 	results = resultsPb.Obj.(model.TransitionResp)
 	ts.Assert().Equal(model.TransitionStatusCompleted, results.TransitionStatus,
-	                  "Test 3 failed with transition status, %s. Expected %s",
-	                  results.TransitionStatus, model.TransitionStatusCompleted)
+		"Test 3 failed with transition status, %s. Expected %s",
+		results.TransitionStatus, model.TransitionStatusCompleted)
 	ts.Assert().Equal(2, results.TaskCounts.Succeeded,
-	                  "Test 3 failed with unexpected task succeeded count, %d. Expected %d",
-	                  results.TaskCounts.Succeeded, 2)
+		"Test 3 failed with unexpected task succeeded count, %d. Expected %d",
+		results.TaskCounts.Succeeded, 2)
 
 	/////////
 	// Test 4 - doTransition() Off
@@ -270,11 +270,11 @@ func (ts *Transitions_TS) TestDoTransition() {
 		}
 	}
 	ts.Assert().Equal(model.TransitionStatusCompleted, results.TransitionStatus,
-	                  "Test 4 failed with transition status, %s. Expected %s",
-	                  results.TransitionStatus, model.TransitionStatusCompleted)
+		"Test 4 failed with transition status, %s. Expected %s",
+		results.TransitionStatus, model.TransitionStatusCompleted)
 	ts.Assert().Equal(2, results.TaskCounts.Succeeded,
-	                  "Test 4 failed with unexpected task succeeded count, %d. Expected %d",
-	                  results.TaskCounts.Succeeded, 2)
+		"Test 4 failed with unexpected task succeeded count, %d. Expected %d",
+		results.TaskCounts.Succeeded, 2)
 
 	/////////
 	// Update power state data for the next tests
@@ -284,7 +284,7 @@ func (ts *Transitions_TS) TestDoTransition() {
 
 	/////////
 	// Test 5 - doTransition() Restart Init task w/ 4 previously created incomplete tasks.
-	// Transition state: 
+	// Transition state:
 	// - x0c0s1b0n0(off) off command received waiting to confirm
 	// - x0c0s2b0n0(on) off command may have been sent.
 	// - x0c0s1(off) Nothing done yet
@@ -339,11 +339,11 @@ func (ts *Transitions_TS) TestDoTransition() {
 		}
 	}
 	ts.Assert().Equal(model.TransitionStatusCompleted, results.TransitionStatus,
-	                  "Test 5 failed with transition status, %s. Expected %s",
-	                  results.TransitionStatus, model.TransitionStatusCompleted)
+		"Test 5 failed with transition status, %s. Expected %s",
+		results.TransitionStatus, model.TransitionStatusCompleted)
 	ts.Assert().Equal(4, results.TaskCounts.Succeeded,
-	                  "Test 5 failed with unexpected task succeeded count, %d. Expected %d",
-	                  results.TaskCounts.Succeeded, 4)
+		"Test 5 failed with unexpected task succeeded count, %d. Expected %d",
+		results.TaskCounts.Succeeded, 4)
 }
 
 func (ts *Transitions_TS) TestAbortTransitionID() {
@@ -363,8 +363,8 @@ func (ts *Transitions_TS) TestAbortTransitionID() {
 	id := uuid.New()
 	resultsPb = AbortTransitionID(id)
 	ts.Assert().Equal(http.StatusNotFound, resultsPb.StatusCode,
-	                  "Test 1 failed with status code, %d. Expected %d",
-	                  resultsPb.StatusCode, http.StatusNotFound)
+		"Test 1 failed with status code, %d. Expected %d",
+		resultsPb.StatusCode, http.StatusNotFound)
 
 	/////////
 	// Test 2 - AbortTransitionID() Already complete.
@@ -381,8 +381,8 @@ func (ts *Transitions_TS) TestAbortTransitionID() {
 	(*GLOB.DSP).StoreTransition(testTransition)
 	resultsPb = AbortTransitionID(testTransition.TransitionID)
 	ts.Assert().Equal(http.StatusBadRequest, resultsPb.StatusCode,
-	                  "Test 2 failed with status code, %d. Expected %d",
-	                  resultsPb.StatusCode, http.StatusBadRequest)
+		"Test 2 failed with status code, %d. Expected %d",
+		resultsPb.StatusCode, http.StatusBadRequest)
 
 	/////////
 	// Test 3 - AbortTransitionID() Success.
@@ -398,13 +398,13 @@ func (ts *Transitions_TS) TestAbortTransitionID() {
 	(*GLOB.DSP).StoreTransition(testTransition)
 	resultsPb = AbortTransitionID(testTransition.TransitionID)
 	ts.Assert().Equal(http.StatusAccepted, resultsPb.StatusCode,
-	                  "Test 3 failed with status code, %d. Expected %d",
-	                  resultsPb.StatusCode, http.StatusAccepted)
+		"Test 3 failed with status code, %d. Expected %d",
+		resultsPb.StatusCode, http.StatusAccepted)
 	resultsPb = GetTransition(testTransition.TransitionID)
 	results = resultsPb.Obj.(model.TransitionResp)
 	ts.Assert().Equal(model.TransitionStatusAbortSignaled, results.TransitionStatus,
-	                  "Test 3 failed with transition status, %s. Expected %s",
-	                  results.TransitionStatus, model.TransitionStatusAbortSignaled)
+		"Test 3 failed with transition status, %s. Expected %s",
+		results.TransitionStatus, model.TransitionStatusAbortSignaled)
 }
 
 func (ts *Transitions_TS) TestCheckAbort() {
@@ -430,11 +430,11 @@ func (ts *Transitions_TS) TestCheckAbort() {
 	testTransition, _ = model.ToTransition(testParams, GLOB.ExpireTimeMins)
 	resultsAbort, err = checkAbort(testTransition)
 	ts.Assert().Empty(err,
-	                  "Test 1 failed with error, %v. Expected %s",
-	                  err, "nil")
+		"Test 1 failed with error, %v. Expected %s",
+		err, "nil")
 	ts.Assert().Equal(false, resultsAbort,
-	                  "Test 1 failed with abort bool, %v. Expected %v",
-	                  resultsAbort, false)
+		"Test 1 failed with abort bool, %v. Expected %v",
+		resultsAbort, false)
 
 	/////////
 	// Test 2 - checkAbort() Exists, no abort.
@@ -450,11 +450,11 @@ func (ts *Transitions_TS) TestCheckAbort() {
 	(*GLOB.DSP).StoreTransition(testTransition)
 	resultsAbort, err = checkAbort(testTransition)
 	ts.Assert().Empty(err,
-	                  "Test 2 failed with error, %v. Expected %s",
-	                  err, "nil")
+		"Test 2 failed with error, %v. Expected %s",
+		err, "nil")
 	ts.Assert().Equal(false, resultsAbort,
-	                  "Test 2 failed with abort bool, %v. Expected %v",
-	                  resultsAbort, false)
+		"Test 2 failed with abort bool, %v. Expected %v",
+		resultsAbort, false)
 
 	/////////
 	// Test 3 - checkAbort() Exists, w\ abort.
@@ -464,11 +464,11 @@ func (ts *Transitions_TS) TestCheckAbort() {
 	(*GLOB.DSP).StoreTransition(testTransition)
 	resultsAbort, err = checkAbort(testTransition)
 	ts.Assert().Empty(err,
-	                  "Test 3 failed with error, %v. Expected %s",
-	                  err, "nil")
+		"Test 3 failed with error, %v. Expected %s",
+		err, "nil")
 	ts.Assert().Equal(true, resultsAbort,
-	                  "Test 3 failed with abort bool, %v. Expected %v",
-	                  resultsAbort, true)
+		"Test 3 failed with abort bool, %v. Expected %v",
+		resultsAbort, true)
 }
 
 func (ts *Transitions_TS) TestDoAbort() {
@@ -516,25 +516,25 @@ func (ts *Transitions_TS) TestDoAbort() {
 	testXnameMap := map[string]*TransitionComponent{
 		"x0c0s1b0n0": &TransitionComponent{Task: &task1},
 		"x0c0s2b0n0": &TransitionComponent{Task: &task2},
-		"x0c0s1": &TransitionComponent{Task: &task3},
-		"x0c0s2": &TransitionComponent{Task: &task4},
+		"x0c0s1":     &TransitionComponent{Task: &task3},
+		"x0c0s2":     &TransitionComponent{Task: &task4},
 	}
 	doAbort(testTransition, testXnameMap)
 
 	resultsPb = GetTransition(testTransition.TransitionID)
 	results = resultsPb.Obj.(model.TransitionResp)
 	ts.Assert().Equal(model.TransitionStatusAborted, results.TransitionStatus,
-	                  "Test 1 failed with transition status, %s. Expected %s",
-	                  results.TransitionStatus, model.TransitionStatusAborted)
+		"Test 1 failed with transition status, %s. Expected %s",
+		results.TransitionStatus, model.TransitionStatusAborted)
 	ts.Assert().Equal(4, results.TaskCounts.Total,
-	                  "Test 1 failed with unexpected task total count, %d. Expected %d",
-	                  results.TaskCounts.Total, 4)
+		"Test 1 failed with unexpected task total count, %d. Expected %d",
+		results.TaskCounts.Total, 4)
 	ts.Assert().Equal(3, results.TaskCounts.Failed,
-	                  "Test 1 failed with unexpected task failed count, %d. Expected %d",
-	                  results.TaskCounts.Failed, 3)
+		"Test 1 failed with unexpected task failed count, %d. Expected %d",
+		results.TaskCounts.Failed, 3)
 	ts.Assert().Equal(1, results.TaskCounts.Succeeded,
-	                  "Test 1 failed with unexpected task succeeded count, %d. Expected %d",
-	                  results.TaskCounts.Succeeded, 1)
+		"Test 1 failed with unexpected task succeeded count, %d. Expected %d",
+		results.TaskCounts.Succeeded, 1)
 }
 
 func (ts *Transitions_TS) TestSequenceComponents() {
@@ -562,7 +562,7 @@ func (ts *Transitions_TS) TestSequenceComponents() {
 	}
 	testTransition, _ = model.ToTransition(testParams, GLOB.ExpireTimeMins)
 	(*GLOB.DSP).StoreTransition(testTransition)
-	xnames := []string{"x0c0s1b0n0","x0c0s2b0n0","x0c0s1","x0c0s2"}
+	xnames := []string{"x0c0s1b0n0", "x0c0s2b0n0", "x0c0s1", "x0c0s2"}
 	pStates, _, _ := getPowerStateHierarchy(xnames)
 	hsmData, _ := (*GLOB.HSM).FillHSMData(xnames)
 	task1 := model.NewTransitionTask(testTransition.TransitionID, testTransition.Operation)
@@ -604,54 +604,54 @@ func (ts *Transitions_TS) TestSequenceComponents() {
 
 	testXnameMap = map[string]*TransitionComponent{
 		"x0c0s1b0n0": &TransitionComponent{
-			PState: &pState1,
+			PState:  &pState1,
 			HSMData: hsmData["x0c0s1b0n0"],
-			Task: &task1,
+			Task:    &task1,
 			Actions: actions1,
 		},
 		"x0c0s2b0n0": &TransitionComponent{
-			PState: &pState2,
+			PState:  &pState2,
 			HSMData: hsmData["x0c0s2b0n0"],
-			Task: &task2,
+			Task:    &task2,
 			Actions: actions2,
 		},
 		"x0c0s1": &TransitionComponent{
-			PState: &pState3,
+			PState:  &pState3,
 			HSMData: hsmData["x0c0s1"],
-			Task: &task3,
+			Task:    &task3,
 			Actions: actions3,
 		},
 		"x0c0s2": &TransitionComponent{
-			PState: &pState4,
+			PState:  &pState4,
 			HSMData: hsmData["x0c0s2"],
-			Task: &task4,
+			Task:    &task4,
 			Actions: actions4,
 		},
 	}
 
 	resultsSeq, _ = sequenceComponents(testTransition.Operation, testXnameMap)
 	ts.Assert().Equal(0, len(resultsSeq["on"]),
-	                  "Test 1 failed with sequence map 'on' len, %d. Expected %d",
-	                  len(resultsSeq["on"]), 0)
+		"Test 1 failed with sequence map 'on' len, %d. Expected %d",
+		len(resultsSeq["on"]), 0)
 	ts.Assert().Equal(2, len(resultsSeq["gracefulshutdown"]),
-	                  "Test 1 failed with sequence map 'gracefulshutdown' len, %d. Expected %d",
-	                  len(resultsSeq["gracefulshutdown"]), 2)
+		"Test 1 failed with sequence map 'gracefulshutdown' len, %d. Expected %d",
+		len(resultsSeq["gracefulshutdown"]), 2)
 	ts.Assert().Equal(2, len(resultsSeq["gracefulshutdown"]["Node"]),
-	                  "Test 1 failed with sequence map 'gracefulshutdown'.'Node' len, %d. Expected %d",
-	                  len(resultsSeq["gracefulshutdown"]["Node"]), 2)
+		"Test 1 failed with sequence map 'gracefulshutdown'.'Node' len, %d. Expected %d",
+		len(resultsSeq["gracefulshutdown"]["Node"]), 2)
 	ts.Assert().Equal(2, len(resultsSeq["gracefulshutdown"]["ComputeModule"]),
-	                  "Test 1 failed with sequence map 'gracefulshutdown'.'ComputeModule' len, %d. Expected %d",
-	                  len(resultsSeq["gracefulshutdown"]["ComputeModule"]), 2)
+		"Test 1 failed with sequence map 'gracefulshutdown'.'ComputeModule' len, %d. Expected %d",
+		len(resultsSeq["gracefulshutdown"]["ComputeModule"]), 2)
 	ts.Assert().Equal(0, len(resultsSeq["gracefulrestart"]),
-	                  "Test 1 failed with sequence map 'gracefulrestart' len, %d. Expected %d",
-	                  len(resultsSeq["gracefulrestart"]), 0)
+		"Test 1 failed with sequence map 'gracefulrestart' len, %d. Expected %d",
+		len(resultsSeq["gracefulrestart"]), 0)
 	ts.Assert().Equal(0, len(resultsSeq["forceoff"]),
-	                  "Test 1 failed with sequence map 'forceoff' len, %d. Expected %d",
-	                  len(resultsSeq["forceoff"]), 0)
+		"Test 1 failed with sequence map 'forceoff' len, %d. Expected %d",
+		len(resultsSeq["forceoff"]), 0)
 
 	/////////
 	// Test 2 - sequenceComponents() - 4 components in-progress init
-	// Transition state: 
+	// Transition state:
 	// - x0c0s1b0n0(off) off command received waiting to confirm
 	// - x0c0s2b0n0(on) off command may have been sent.
 	// - x0c0s1(off) Nothing done yet
@@ -670,7 +670,7 @@ func (ts *Transitions_TS) TestSequenceComponents() {
 	testTransition, _ = model.ToTransition(testParams, GLOB.ExpireTimeMins)
 	testTransition.Status = model.TransitionStatusInProgress
 	(*GLOB.DSP).StoreTransition(testTransition)
-	xnames = []string{"x0c0s1b0n0","x0c0s2b0n0","x0c0s1","x0c0s2"}
+	xnames = []string{"x0c0s1b0n0", "x0c0s2b0n0", "x0c0s1", "x0c0s2"}
 	pStates, _, _ = getPowerStateHierarchy(xnames)
 	hsmData, _ = (*GLOB.HSM).FillHSMData(xnames)
 	task1 = model.NewTransitionTask(testTransition.TransitionID, testTransition.Operation)
@@ -721,56 +721,56 @@ func (ts *Transitions_TS) TestSequenceComponents() {
 
 	testXnameMap = map[string]*TransitionComponent{
 		"x0c0s1b0n0": &TransitionComponent{
-			PState: &pState1,
+			PState:  &pState1,
 			HSMData: hsmData["x0c0s1b0n0"],
-			Task: &task1,
+			Task:    &task1,
 			Actions: actions1,
 		},
 		"x0c0s2b0n0": &TransitionComponent{
-			PState: &pState2,
+			PState:  &pState2,
 			HSMData: hsmData["x0c0s2b0n0"],
-			Task: &task2,
+			Task:    &task2,
 			Actions: actions2,
 		},
 		"x0c0s1": &TransitionComponent{
-			PState: &pState3,
+			PState:  &pState3,
 			HSMData: hsmData["x0c0s1"],
-			Task: &task3,
+			Task:    &task3,
 			Actions: actions3,
 		},
 		"x0c0s2": &TransitionComponent{
-			PState: &pState4,
+			PState:  &pState4,
 			HSMData: hsmData["x0c0s2"],
-			Task: &task4,
+			Task:    &task4,
 			Actions: actions4,
 		},
 	}
 
 	resultsSeq, _ = sequenceComponents(testTransition.Operation, testXnameMap)
 	ts.Assert().Equal(2, len(resultsSeq["on"]),
-	                  "Test 2 failed with sequence map 'on' len, %d. Expected %d",
-	                  len(resultsSeq["on"]), 2)
+		"Test 2 failed with sequence map 'on' len, %d. Expected %d",
+		len(resultsSeq["on"]), 2)
 	ts.Assert().Equal(2, len(resultsSeq["on"]["Node"]),
-	                  "Test 2 failed with sequence map 'on'.'Node' len, %d. Expected %d",
-	                  len(resultsSeq["on"]["Node"]), 2)
+		"Test 2 failed with sequence map 'on'.'Node' len, %d. Expected %d",
+		len(resultsSeq["on"]["Node"]), 2)
 	ts.Assert().Equal(2, len(resultsSeq["on"]["ComputeModule"]),
-	                  "Test 2 failed with sequence map 'on'.'ComputeModule' len, %d. Expected %d",
-	                  len(resultsSeq["on"]["ComputeModule"]), 2)
+		"Test 2 failed with sequence map 'on'.'ComputeModule' len, %d. Expected %d",
+		len(resultsSeq["on"]["ComputeModule"]), 2)
 	ts.Assert().Equal(2, len(resultsSeq["gracefulshutdown"]),
-	                  "Test 2 failed with sequence map 'gracefulshutdown' len, %d. Expected %d",
-	                  len(resultsSeq["gracefulshutdown"]), 2)
+		"Test 2 failed with sequence map 'gracefulshutdown' len, %d. Expected %d",
+		len(resultsSeq["gracefulshutdown"]), 2)
 	ts.Assert().Equal(1, len(resultsSeq["gracefulshutdown"]["Node"]),
-	                  "Test 2 failed with sequence map 'gracefulshutdown'.'Node' len, %d. Expected %d",
-	                  len(resultsSeq["gracefulshutdown"]["Node"]), 1)
+		"Test 2 failed with sequence map 'gracefulshutdown'.'Node' len, %d. Expected %d",
+		len(resultsSeq["gracefulshutdown"]["Node"]), 1)
 	ts.Assert().Equal(1, len(resultsSeq["gracefulshutdown"]["ComputeModule"]),
-	                  "Test 2 failed with sequence map 'gracefulshutdown'.'ComputeModule' len, %d. Expected %d",
-	                  len(resultsSeq["gracefulshutdown"]["ComputeModule"]), 1)
+		"Test 2 failed with sequence map 'gracefulshutdown'.'ComputeModule' len, %d. Expected %d",
+		len(resultsSeq["gracefulshutdown"]["ComputeModule"]), 1)
 	ts.Assert().Equal(0, len(resultsSeq["gracefulrestart"]),
-	                  "Test 2 failed with sequence map 'gracefulrestart' len, %d. Expected %d",
-	                  len(resultsSeq["gracefulrestart"]), 0)
+		"Test 2 failed with sequence map 'gracefulrestart' len, %d. Expected %d",
+		len(resultsSeq["gracefulrestart"]), 0)
 	ts.Assert().Equal(0, len(resultsSeq["forceoff"]),
-	                  "Test 2 failed with sequence map 'forceoff' len, %d. Expected %d",
-	                  len(resultsSeq["forceoff"]), 0)
+		"Test 2 failed with sequence map 'forceoff' len, %d. Expected %d",
+		len(resultsSeq["forceoff"]), 0)
 }
 
 func (ts *Transitions_TS) TestGetPowerSupplies() {
@@ -800,20 +800,20 @@ func (ts *Transitions_TS) TestGetPowerSupplies() {
 	results = getPowerSupplies(&testParams)
 
 	ts.Assert().Equal(2, len(results),
-	                  "Test 1 failed with powerSupply array len, %d. Expected %d",
-	                  len(results), 2)
+		"Test 1 failed with powerSupply array len, %d. Expected %d",
+		len(results), 2)
 	ts.Assert().Equal(connectorXname1, results[0].ID,
-	                  "Test 1 failed with powerSupply[0] ID, %s. Expected %s",
-	                  results[0].ID, connectorXname1)
+		"Test 1 failed with powerSupply[0] ID, %s. Expected %s",
+		results[0].ID, connectorXname1)
 	ts.Assert().Equal(model.PowerStateFilter_On, results[0].State,
-	                  "Test 1 failed with powerSupply[0] State, %s. Expected %s",
-	                  results[0].State.String(), model.PowerStateFilter_On.String())
+		"Test 1 failed with powerSupply[0] State, %s. Expected %s",
+		results[0].State.String(), model.PowerStateFilter_On.String())
 	ts.Assert().Equal(connectorXname2, results[1].ID,
-	                  "Test 1 failed with powerSupply[1] ID, %s. Expected %s",
-	                  results[1].ID, connectorXname2)
+		"Test 1 failed with powerSupply[1] ID, %s. Expected %s",
+		results[1].ID, connectorXname2)
 	ts.Assert().Equal(model.PowerStateFilter_Undefined, results[1].State,
-	                  "Test 1 failed with powerSupply[1] State, %s. Expected %s",
-	                  results[1].State.String(), model.PowerStateFilter_Undefined.String())
+		"Test 1 failed with powerSupply[1] State, %s. Expected %s",
+		results[1].State.String(), model.PowerStateFilter_Undefined.String())
 
 	/////////
 	// Test 2 - getPowerSupplies() - 2 power supplies
@@ -834,20 +834,20 @@ func (ts *Transitions_TS) TestGetPowerSupplies() {
 	results = getPowerSupplies(&testParams)
 
 	ts.Assert().Equal(2, len(results),
-	                  "Test 1 failed with powerSupply array len, %d. Expected %d",
-	                  len(results), 2)
+		"Test 1 failed with powerSupply array len, %d. Expected %d",
+		len(results), 2)
 	ts.Assert().Equal(connectorXname1, results[0].ID,
-	                  "Test 1 failed with powerSupply[0] ID, %s. Expected %s",
-	                  results[0].ID, connectorXname1)
+		"Test 1 failed with powerSupply[0] ID, %s. Expected %s",
+		results[0].ID, connectorXname1)
 	ts.Assert().Equal(model.PowerStateFilter_On, results[0].State,
-	                  "Test 1 failed with powerSupply[0] State, %s. Expected %s",
-	                  results[0].State.String(), model.PowerStateFilter_On.String())
+		"Test 1 failed with powerSupply[0] State, %s. Expected %s",
+		results[0].State.String(), model.PowerStateFilter_On.String())
 	ts.Assert().Equal(connectorXname2, results[1].ID,
-	                  "Test 1 failed with powerSupply[1] ID, %s. Expected %s",
-	                  results[1].ID, connectorXname2)
+		"Test 1 failed with powerSupply[1] ID, %s. Expected %s",
+		results[1].ID, connectorXname2)
 	ts.Assert().Equal(model.PowerStateFilter_Off, results[1].State,
-	                  "Test 1 failed with powerSupply[1] State, %s. Expected %s",
-	                  results[1].State.String(), model.PowerStateFilter_Off.String())
+		"Test 1 failed with powerSupply[1] State, %s. Expected %s",
+		results[1].State.String(), model.PowerStateFilter_Off.String())
 
 	/////////
 	// Test 3 - getPowerSupplies() - No power supplies
@@ -858,8 +858,8 @@ func (ts *Transitions_TS) TestGetPowerSupplies() {
 	results = getPowerSupplies(&testParams)
 
 	ts.Assert().Equal(0, len(results),
-	                  "Test 1 failed with powerSupply array len, %d. Expected %d",
-	                  len(results), 0)
+		"Test 1 failed with powerSupply array len, %d. Expected %d",
+		len(results), 0)
 }
 
 func (ts *Transitions_TS) TestFailDependentComps() {
@@ -915,11 +915,11 @@ func (ts *Transitions_TS) TestFailDependentComps() {
 	failDependentComps(testXnameMap, "gracefulshutdown", nodeXname, "Test Error")
 
 	ts.Assert().Equal(model.TransitionTaskStatusFailed, task2.Status,
-	                  "Test 1 failed with computeModule Task.Status, %s. Expected %s",
-	                  task2.Status, model.TransitionTaskStatusFailed)
+		"Test 1 failed with computeModule Task.Status, %s. Expected %s",
+		task2.Status, model.TransitionTaskStatusFailed)
 	ts.Assert().Equal(model.TransitionTaskStatusFailed, task3.Status,
-	                  "Test 1 failed with powerConnector Task.Status, %s. Expected %s",
-	                  task3.Status, model.TransitionTaskStatusFailed)
+		"Test 1 failed with powerConnector Task.Status, %s. Expected %s",
+		task3.Status, model.TransitionTaskStatusFailed)
 
 	/////////
 	// Test 2 - failDependentComps() - Node 2 power supplies, 1 in our list, will not lose power
@@ -967,11 +967,11 @@ func (ts *Transitions_TS) TestFailDependentComps() {
 	failDependentComps(testXnameMap, "gracefulshutdown", nodeXname, "Test Error")
 
 	ts.Assert().Equal(model.TransitionTaskStatusFailed, task2.Status,
-	                  "Test 1 failed with computeModule Task.Status, %s. Expected %s",
-	                  task2.Status, model.TransitionTaskStatusFailed)
+		"Test 1 failed with computeModule Task.Status, %s. Expected %s",
+		task2.Status, model.TransitionTaskStatusFailed)
 	ts.Assert().Equal(model.TransitionTaskStatusNew, task3.Status,
-	                  "Test 1 failed with powerConnector Task.Status, %s. Expected %s",
-	                  task3.Status, model.TransitionTaskStatusNew)
+		"Test 1 failed with powerConnector Task.Status, %s. Expected %s",
+		task3.Status, model.TransitionTaskStatusNew)
 
 	/////////
 	// Test 3 - failDependentComps() - Node missing power supplies, 1 in our list
@@ -1006,11 +1006,11 @@ func (ts *Transitions_TS) TestFailDependentComps() {
 	failDependentComps(testXnameMap, "gracefulshutdown", nodeXname, "Test Error")
 
 	ts.Assert().Equal(model.TransitionTaskStatusFailed, task2.Status,
-	                  "Test 1 failed with computeModule Task.Status, %s. Expected %s",
-	                  task2.Status, model.TransitionTaskStatusFailed)
+		"Test 1 failed with computeModule Task.Status, %s. Expected %s",
+		task2.Status, model.TransitionTaskStatusFailed)
 	ts.Assert().Equal(model.TransitionTaskStatusNew, task3.Status,
-	                  "Test 1 failed with powerConnector Task.Status, %s. Expected %s",
-	                  task3.Status, model.TransitionTaskStatusNew)
+		"Test 1 failed with powerConnector Task.Status, %s. Expected %s",
+		task3.Status, model.TransitionTaskStatusNew)
 
 	/////////
 	// Test 4 - failDependentComps() - Node 2 power supplies, both in our list
@@ -1064,12 +1064,12 @@ func (ts *Transitions_TS) TestFailDependentComps() {
 	failDependentComps(testXnameMap, "gracefulshutdown", nodeXname, "Test Error")
 
 	ts.Assert().Equal(model.TransitionTaskStatusFailed, task2.Status,
-	                  "Test 1 failed with computeModule Task.Status, %s. Expected %s",
-	                  task2.Status, model.TransitionTaskStatusFailed)
+		"Test 1 failed with computeModule Task.Status, %s. Expected %s",
+		task2.Status, model.TransitionTaskStatusFailed)
 	ts.Assert().Equal(model.TransitionTaskStatusNew, task3.Status,
-	                  "Test 1 failed with powerConnector Task.Status, %s. Expected %s",
-	                  task3.Status, model.TransitionTaskStatusNew)
+		"Test 1 failed with powerConnector Task.Status, %s. Expected %s",
+		task3.Status, model.TransitionTaskStatusNew)
 	ts.Assert().Equal(model.TransitionTaskStatusFailed, task4.Status,
-	                  "Test 1 failed with powerConnector Task.Status, %s. Expected %s",
-	                  task4.Status, model.TransitionTaskStatusFailed)
+		"Test 1 failed with powerConnector Task.Status, %s. Expected %s",
+		task4.Status, model.TransitionTaskStatusFailed)
 }

@@ -23,7 +23,7 @@
 # Dockerfile for building hms-power-control.
 
 # Build base just has the packages installed we need.
-FROM artifactory.algol60.net/docker.io/library/golang:1.23-alpine AS build-base
+FROM docker.io/library/golang:1.23-alpine AS build-base
 
 RUN set -ex \
     && apk -U upgrade \
@@ -47,7 +47,7 @@ RUN set -ex && go build -v -tags musl -o /usr/local/bin/hms-power-control github
 
 ### Final Stage ###
 
-FROM artifactory.algol60.net/docker.io/alpine:3
+FROM docker.io/alpine:3
 LABEL maintainer="Hewlett Packard Enterprise"
 EXPOSE 28007
 STOPSIGNAL SIGTERM
