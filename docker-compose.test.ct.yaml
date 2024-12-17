@@ -123,26 +123,6 @@ services:
     networks:
       - pcs
 
-  cray-hms-hmcollector:
-    image: hms-hmcollector
-    environment:
-      - LOG_LEVEL=TRACE
-      - SM_URL=http://cray:27779
-      - POLLING_ENABLED=false
-      - RF_SUBSCRIBE_ENABLED=false
-      - REST_PORT=80
-      - VAULT_TOKEN=hms
-      - CRAY_VAULT_JWT_FILE=configs/token
-      - CRAY_VAULT_ROLE_FILE=configs/namespace
-      - CRAY_VAULT_AUTH_PATH=auth/token/create
-      - VAULT_ADDR=http://vault:8200
-    volumes:
-      - ./configs/kafka_brokers.json:/configs/kafka_brokers.json
-      - ./configs/namespace:/configs/namespace
-      - ./configs/token:/configs/token
-    networks:
-      - pcs
-
   #
   # Emulated hardware
   #
