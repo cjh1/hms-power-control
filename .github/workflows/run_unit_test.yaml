@@ -1,8 +1,20 @@
-name: Run Unit Tests
-on: [push, pull_request, workflow_dispatch]
+name: run unit tests
+on:
+  - push
+  - pull_request
+  - workflow_dispatch
+env:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
 jobs:
   run_unit_test:
-    uses: Cray-HPE/hms-build-image-workflows/.github/workflows/run_unit_test.yaml@v2
-    with:
-      runs-on: ubuntu-latest
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out the repo
+        uses: actions/checkout@v4
+      - name: install docker compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+      - name: run unit tests
+        run: ./runUnitTest.sh

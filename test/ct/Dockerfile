@@ -20,9 +20,11 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-FROM hms-test
+FROM docker.io/library/python:3.13-slim
 
-COPY smoke/ /src/app
+RUN pip install pytest tavern
+
+COPY smoke/ /src/app/smoke
 COPY api/ /src/app/api
 COPY tavern_global_config_ct_test_emulated_hardware.yaml /src/app/tavern_global_config_ct_test_emulated_hardware.yaml
 COPY tavern_global_config_ct_test_production.yaml /src/app/tavern_global_config_ct_test_production.yaml
@@ -30,9 +32,3 @@ COPY tavern_global_config_ct_test_production.yaml /src/app/tavern_global_config_
 ENV PATH="/src/libs:${PATH}"
 ENV PATH="/src/app:${PATH}"
 
-USER root
-RUN chown -R 65534:65534 /src
-USER 65534:65534
-
-# this is inherited from the hms-test container
-ENTRYPOINT [ "entrypoint.sh" ]

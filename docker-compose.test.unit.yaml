@@ -87,7 +87,6 @@ services:
   smd:
     image: ghcr.io/openchami/smd:2.17
     environment:
-      -
       - RF_MSG_HOST=kafka:9092:cray-dmtf-resource-event
       - CRAY_VAULT_AUTH_PATH=auth/token/create
       - CRAY_VAULT_ROLE_FILE=configs/namespace

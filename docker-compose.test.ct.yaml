@@ -367,7 +367,7 @@ services:
     build:
       context: test/ct/
       dockerfile: Dockerfile
-    entrypoint: entrypoint.sh tavern -c /src/app/tavern_global_config_ct_test_emulated_hardware.yaml -p /src/app/api
+    entrypoint: "pytest -vvvv --tavern-global-cfg=/src/app/tavern_global_config_ct_test_emulated_hardware.yaml /src/app/api"
     networks:
       - pcs
 
