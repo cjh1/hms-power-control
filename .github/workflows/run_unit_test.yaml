@@ -1,4 +1,4 @@
-name: run unit tests
+name: Run Unit Tests
 on:
   - push
   - pull_request
@@ -7,14 +7,14 @@ env:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: postgres
 jobs:
-  run_unit_test:
+  run_unit_tests:
     runs-on: ubuntu-latest
     steps:
-      - name: check out the repo
+      - name: Check out the repo
         uses: actions/checkout@v4
-      - name: install docker compose
+      - name: Install docker compose
         run: |
           sudo apt-get update
-          sudo apt-get install -y docker-compose
-      - name: run unit tests
-        run: ./runUnitTest.sh
+          sudo apt-get install -y docker-compose make
+      - name: Run unit tests
+        run: make unittest
