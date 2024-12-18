@@ -22,7 +22,6 @@ services:
     depends_on:
       - etcd
       - smd
-      - cray-hms-hmcollector
       - emulator-loader
       - vault-kv-enabler
     networks:
@@ -76,8 +75,8 @@ services:
       - SMD_DBHOST=postgres
       - SMD_DBPORT=5432
       - SMD_DBNAME=hmsds
-      - SMD_DBUSER=${POSTGRES_USER} # Set in .env file
-      - SMD_DBPASS=${POSTGRES_PASSWORD} # Set in .env file
+      - SMD_DBUSER=${POSTGRES_USER}
+      - SMD_DBPASS=${POSTGRES_PASSWORD}
       - SMD_DBOPTS=sslmode=disable
     depends_on:
       - postgres
@@ -87,6 +86,13 @@ services:
   smd:
     image: ghcr.io/openchami/smd:2.17
     environment:
+      - SMD_DBHOST=postgres
+      - SMD_DBPORT=5432
+      - SMD_DBNAME=hmsds
+      - SMD_DBUSER=${POSTGRES_USER} # Set in .env file
+      - SMD_DBPASS=${POSTGRES_PASSWORD} # Set in .env file
+      - SMD_DBOPTS=sslmode=disable
+      - SMD_JWKS_URL=
       - RF_MSG_HOST=kafka:9092:cray-dmtf-resource-event
       - CRAY_VAULT_AUTH_PATH=auth/token/create
       - CRAY_VAULT_ROLE_FILE=configs/namespace
@@ -131,27 +137,6 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     networks:
       - pcs
-  cray-hms-hmcollector:
-    image: hms-hmcollector
-    environment:
-      - LOG_LEVEL=TRACE
-      - SM_URL=http://smd:27779
-      - POLLING_ENABLED=false
-      - RF_SUBSCRIBE_ENABLED=false
-      - REST_PORT=80
-      - VAULT_TOKEN=hms
-      - CRAY_VAULT_JWT_FILE=configs/token
-      - CRAY_VAULT_ROLE_FILE=configs/namespace
-      - CRAY_VAULT_AUTH_PATH=auth/token/create
-      - VAULT_ADDR=http://vault:8200
-      - KAFKA_BROKERS_CONFIG=configs/kafka_brokers_local.json
-    volumes:
-      - ./configs/kafka_brokers_local.json:/configs/kafka_brokers_local.json
-      - ./configs/namespace:/configs/namespace
-      - ./configs/token:/configs/token
-    networks:
-      - pcs
-
   #
   # Emulator
   #
