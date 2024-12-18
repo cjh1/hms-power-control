@@ -8,8 +8,8 @@ before:
 
 builds:
   - id: pcs
-    main: ./cmd/power-control
-    binary: power-control
+    main: ./cmd/hms-power-control
+    binary: hms-power-control
     goos:
       - linux
       - darwin
