@@ -367,7 +367,7 @@ services:
     build:
       context: test/ct/
       dockerfile: Dockerfile
-    entrypoint: "pytest -vvvv --tavern-global-cfg=/src/app/tavern_global_config_ct_test_emulated_hardware.yaml /src/app/api"
+    entrypoint: pytest -vvvv --tavern-global-cfg=/src/app/tavern_global_config_ct_test_emulated_hardware.yaml /src/app/api
     networks:
       - pcs
 
@@ -375,6 +375,6 @@ services:
     build:
       context: test/ct/
       dockerfile: Dockerfile
-    entrypoint: entrypoint.sh smoke -f smoke.json -u http://power-control:28007
+    entrypoint:  pytest -vvvv --smoke-json smoke.json --smoke-url http://power-control:28007 /src/app/smoke_pytest
     networks:
       - pcs
