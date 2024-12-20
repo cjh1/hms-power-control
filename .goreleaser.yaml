@@ -70,6 +70,8 @@ dockers:
   #     - LICENSE
   #     - CHANGELOG.md
   #     - README.md
+  #     - configs/
+  #     - .version
 
 docker_manifests:
   - name_template: "ghcr.io/cjh1/{{.ProjectName}}:latest"
