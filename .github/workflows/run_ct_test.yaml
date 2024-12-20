@@ -3,9 +3,6 @@ on:
   - push
   - pull_request
   - workflow_dispatch
-env:
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
 jobs:
   run_ct_tests:
     runs-on: ubuntu-latest
